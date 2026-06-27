@@ -36,16 +36,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Process pending redirect result on mount (mobile sign-in flow).
-  // Must run before the onAuthStateChanged subscription so the resolved
-  // user is available when that callback fires.
   useEffect(() => {
+    // Call getRedirectResult first so Firebase processes any pending OAuth
+    // redirect before onAuthStateChanged fires its initial callback.
     getRedirectSignInResult().catch((err) => {
       console.error('Redirect sign-in error:', err);
     });
-  }, []);
 
-  useEffect(() => {
     const unsub = subscribeToAuthState(async (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
@@ -61,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setLoading(false);
     });
+
     return unsub;
   }, []);
 

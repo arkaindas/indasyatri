@@ -19,14 +19,25 @@ export async function signInWithGoogle(): Promise<FirebaseUser | null> {
   const app = getFirebaseApp();
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
+  const mobile = isMobileBrowser();
 
-  if (isMobileBrowser()) {
-    await signInWithRedirect(auth, provider);
-    return null;
+  console.log('[auth] signInWithGoogle — isMobile:', mobile);
+
+  try {
+    if (mobile) {
+      console.log('[auth] using signInWithRedirect...');
+      await signInWithRedirect(auth, provider);
+      return null;
+    }
+
+    console.log('[auth] using signInWithPopup...');
+    const result = await signInWithPopup(auth, provider);
+    console.log('[auth] popup success:', result.user.email);
+    return result.user;
+  } catch (err) {
+    console.error('[auth] signInWithGoogle error:', err);
+    throw err;
   }
-
-  const result = await signInWithPopup(auth, provider);
-  return result.user;
 }
 
 export async function getRedirectSignInResult(): Promise<FirebaseUser | null> {
