@@ -238,13 +238,13 @@ export async function searchRides(
   const q = query(
     collection(db(), 'rides'),
     where('routeFrom', '==', from),
-    where('routeTo', '==', to),
-    where('date', '==', date),
-    where('status', '==', 'active'),
-    orderBy('departureTime', 'asc')
+    where('routeTo', '==', to)
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ ...d.data(), id: d.id } as Ride));
+  return snap.docs
+    .map((d) => ({ ...d.data(), id: d.id } as unknown as Ride))
+    .filter((r) => r.date === date && r.status !== 'cancelled')
+    .sort((a, b) => a.departureTime.localeCompare(b.departureTime));
 }
 
 export async function getRide(rideId: string): Promise<Ride | null> {
