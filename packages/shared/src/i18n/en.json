@@ -94,7 +94,8 @@
     "noAlerts": "No active alerts",
     "maxAlerts": "Maximum 5 alerts allowed",
     "anyDate": "Any date",
-    "delete": "Delete alert"
+    "delete": "Delete alert",
+    "savedNoPermission": "Alert saved. Enable browser notifications to receive push alerts."
   },
   "profile": {
     "title": "My Profile",

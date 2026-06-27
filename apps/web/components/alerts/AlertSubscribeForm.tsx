@@ -25,7 +25,7 @@ export function AlertSubscribeForm({ onCreated }: { onCreated?: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !selectedRoute) return;
+    if (!user || !selectedRoute || submitting) return;
 
     setSubmitting(true);
     try {
@@ -40,8 +40,15 @@ export function AlertSubscribeForm({ onCreated }: { onCreated?: () => void }) {
         isActive: true,
         fcmToken,
       });
-      showToast(t('alert.notify'), 'success');
-      setRouteId(''); setDate('any');
+
+      if (fcmToken) {
+        showToast(t('alert.notify'), 'success');
+      } else {
+        showToast(t('alert.savedNoPermission'), 'info');
+      }
+
+      setRouteId('');
+      setDate('any');
       onCreated?.();
     } catch {
       showToast(t('common.error'), 'error');

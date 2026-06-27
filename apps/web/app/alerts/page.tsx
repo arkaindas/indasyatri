@@ -8,16 +8,21 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useLang } from '@/context/LangContext';
 import { useAuth } from '@/context/AuthContext';
 import { useAlerts } from '@/hooks/useAlerts';
+import { getUserAlerts } from '@indasyatri/shared';
 
 function AlertsContent() {
   const { t } = useLang();
   const { user } = useAuth();
   const { alerts, loading, setAlerts } = useAlerts(user?.uid);
 
-  const handleCreated = () => {
+  const handleCreated = async () => {
     if (user) {
-      // re-trigger via reload
-      setAlerts([]);
+      try {
+        const updated = await getUserAlerts(user.uid);
+        setAlerts(updated);
+      } catch {
+        // list will still show the previous state
+      }
     }
   };
 
