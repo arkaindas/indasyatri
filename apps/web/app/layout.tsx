@@ -7,6 +7,7 @@ import { ToastProvider } from '@/components/common/Toast';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
+import PWABanner from '@/components/common/PWABanner';
 
 export const metadata: Metadata = {
   title: 'IndasYatri — ইন্দাসযাত্রী',
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </main>
                 <Footer />
                 <MobileNav />
+                <PWABanner />
               </ToastProvider>
             </AuthProvider>
           </LangProvider>
