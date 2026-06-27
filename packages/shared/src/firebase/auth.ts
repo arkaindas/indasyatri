@@ -2,67 +2,32 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   type User as FirebaseUser,
+  type UserCredential,
 } from 'firebase/auth';
 import { getFirebaseApp } from './config';
 
-function isMobileBrowser(): boolean {
-  if (typeof window === 'undefined') return false;
-  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-}
-
-export async function signInWithGoogle(): Promise<FirebaseUser | null> {
-  const app = getFirebaseApp();
-  const auth = getAuth(app);
+export function signInWithGoogle(): Promise<UserCredential> {
+  const auth = getAuth(getFirebaseApp());
   const provider = new GoogleAuthProvider();
-  const mobile = isMobileBrowser();
-
-  console.log('[auth] signInWithGoogle — isMobile:', mobile);
-
-  try {
-    if (mobile) {
-      console.log('[auth] using signInWithRedirect...');
-      await signInWithRedirect(auth, provider);
-      return null;
-    }
-
-    console.log('[auth] using signInWithPopup...');
-    const result = await signInWithPopup(auth, provider);
-    console.log('[auth] popup success:', result.user.email);
-    return result.user;
-  } catch (err) {
-    console.error('[auth] signInWithGoogle error:', err);
-    throw err;
-  }
-}
-
-export async function getRedirectSignInResult(): Promise<FirebaseUser | null> {
-  const app = getFirebaseApp();
-  const auth = getAuth(app);
-  const result = await getRedirectResult(auth);
-  return result?.user ?? null;
+  provider.setCustomParameters({ prompt: 'select_account' });
+  // Not async — signInWithPopup must be called synchronously within the
+  // click handler to satisfy mobile browser popup-gesture requirements.
+  return signInWithPopup(auth, provider);
 }
 
 export async function signOut(): Promise<void> {
-  const app = getFirebaseApp();
-  const auth = getAuth(app);
-  await firebaseSignOut(auth);
+  await firebaseSignOut(getAuth(getFirebaseApp()));
 }
 
 export function subscribeToAuthState(
   callback: (user: FirebaseUser | null) => void
 ): () => void {
-  const app = getFirebaseApp();
-  const auth = getAuth(app);
-  return onAuthStateChanged(auth, callback);
+  return onAuthStateChanged(getAuth(getFirebaseApp()), callback);
 }
 
 export function getCurrentUser(): FirebaseUser | null {
-  const app = getFirebaseApp();
-  const auth = getAuth(app);
-  return auth.currentUser;
+  return getAuth(getFirebaseApp()).currentUser;
 }

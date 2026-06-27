@@ -4,7 +4,6 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User as FirebaseUser } from 'firebase/auth';
 import {
   subscribeToAuthState,
-  getRedirectSignInResult,
   createOrUpdateUser,
   getUser,
 } from '@indasyatri/shared';
@@ -37,12 +36,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Call getRedirectResult first so Firebase processes any pending OAuth
-    // redirect before onAuthStateChanged fires its initial callback.
-    getRedirectSignInResult().catch((err) => {
-      console.error('Redirect sign-in error:', err);
-    });
-
     const unsub = subscribeToAuthState(async (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
