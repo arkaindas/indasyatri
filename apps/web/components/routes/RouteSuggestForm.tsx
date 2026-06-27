@@ -52,7 +52,7 @@ export function RouteSuggestForm({ onSuccess }: { onSuccess?: () => void }) {
       <div className="grid sm:grid-cols-2 gap-4">
         <NeuInput
           label={t('route.from')}
-          placeholder="e.g., Indus"
+          placeholder="e.g., Indas"
           value={from}
           onChange={(e) => setFrom(e.target.value)}
           required

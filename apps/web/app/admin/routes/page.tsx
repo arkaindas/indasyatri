@@ -107,7 +107,7 @@ export default function AdminRoutesPage() {
 
       {showAdd && (
         <form onSubmit={handleAddRoute} className="neu-card grid sm:grid-cols-2 gap-4">
-          <NeuInput label={t('route.from')} value={from} onChange={(e) => setFrom(e.target.value)} required placeholder="Indus" />
+          <NeuInput label={t('route.from')} value={from} onChange={(e) => setFrom(e.target.value)} required placeholder="Indas" />
           <NeuInput label={t('route.to')} value={to} onChange={(e) => setTo(e.target.value)} required placeholder="Kolkata" />
           <NeuInput label={t('route.fromBn')} value={fromBn} onChange={(e) => setFromBn(e.target.value)} placeholder="ইন্দাস" />
           <NeuInput label={t('route.toBn')} value={toBn} onChange={(e) => setToBn(e.target.value)} placeholder="কলকাতা" />
