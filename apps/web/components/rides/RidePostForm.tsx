@@ -46,31 +46,35 @@ export function RidePostForm() {
 
     const finalModel = vehicleModel === 'Other' ? customModel : vehicleModel;
 
+    const ridePayload = {
+      routeId,
+      routeFrom: selectedRoute.from,
+      routeTo: selectedRoute.to,
+      driverUid: user.uid,
+      driverName: user.name,
+      driverPhoto: user.photoURL,
+      driverPhone: user.phone,
+      driverWhatsapp: user.whatsapp,
+      date,
+      departureTime: time,
+      totalSeats: seats,
+      availableSeats: seats,
+      pricePerSeat: Number(price),
+      vehicleType,
+      vehicleModel: finalModel,
+      vehicleNumber: vehicleNumber.toUpperCase(),
+      notes,
+      status: 'active' as const,
+    };
+    console.log('[offer] posting ride:', JSON.stringify(ridePayload));
+
     setSubmitting(true);
     try {
-      await postRide({
-        routeId,
-        routeFrom: selectedRoute.from,
-        routeTo: selectedRoute.to,
-        driverUid: user.uid,
-        driverName: user.name,
-        driverPhoto: user.photoURL,
-        driverPhone: user.phone,
-        driverWhatsapp: user.whatsapp,
-        date,
-        departureTime: time,
-        totalSeats: seats,
-        availableSeats: seats,
-        pricePerSeat: Number(price),
-        vehicleType,
-        vehicleModel: finalModel,
-        vehicleNumber: vehicleNumber.toUpperCase(),
-        notes,
-        status: 'active',
-      });
+      await postRide(ridePayload);
       showToast('Ride posted successfully!', 'success');
       router.push('/my-rides');
-    } catch {
+    } catch (err) {
+      console.error('[offer] postRide error:', JSON.stringify(err));
       showToast(t('common.error'), 'error');
     } finally {
       setSubmitting(false);

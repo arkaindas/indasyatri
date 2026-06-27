@@ -16,6 +16,7 @@ import {
   serverTimestamp,
   type QuerySnapshot,
   type DocumentData,
+  type Timestamp,
 } from 'firebase/firestore';
 import { getFirebaseApp } from './config';
 import type { User } from '../types/user';
@@ -27,6 +28,13 @@ import type { AppSettings } from '../types/settings';
 
 function db() {
   return getFirestore(getFirebaseApp());
+}
+
+function tsMillis(ts: unknown): number {
+  if (ts && typeof (ts as Timestamp).toMillis === 'function') {
+    return (ts as Timestamp).toMillis();
+  }
+  return 0;
 }
 
 // ── Users ──────────────────────────────────────────────────────────────────
@@ -99,13 +107,12 @@ export async function getAllRoutes(): Promise<Route[]> {
 }
 
 export async function getPendingRoutes(): Promise<Route[]> {
-  const q = query(
-    collection(db(), 'routes'),
-    where('status', '==', 'pending'),
-    orderBy('createdAt', 'desc')
-  );
+  // No orderBy — avoids composite index requirement. Sort client-side.
+  const q = query(collection(db(), 'routes'), where('status', '==', 'pending'));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ ...d.data(), id: d.id } as Route));
+  return snap.docs
+    .map((d) => ({ ...d.data(), id: d.id } as Route))
+    .sort((a, b) => tsMillis(b.createdAt) - tsMillis(a.createdAt));
 }
 
 export async function suggestRoute(
@@ -130,7 +137,6 @@ export async function approveRoute(routeId: string, route: Route): Promise<void>
     pairId,
   });
 
-  // auto-create reverse route
   await addDoc(collection(db(), 'routes'), {
     from: route.to,
     to: route.from,
@@ -166,7 +172,6 @@ export async function addRoute(
     pairId,
   });
 
-  // auto-create reverse
   await addDoc(collection(db(), 'routes'), {
     from: data.to,
     to: data.from,
@@ -218,16 +223,13 @@ export async function getUpcomingRides(
   todayStr: string,
   maxDateStr: string
 ): Promise<Ride[]> {
-  const q = query(
-    collection(db(), 'rides'),
-    where('status', '==', 'active'),
-    where('date', '>=', todayStr),
-    where('date', '<=', maxDateStr),
-    orderBy('date', 'asc'),
-    orderBy('departureTime', 'asc')
-  );
+  // Single-field where avoids composite index. Filter dates client-side.
+  const q = query(collection(db(), 'rides'), where('status', '==', 'active'));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ ...d.data(), id: d.id } as Ride));
+  return snap.docs
+    .map((d) => ({ ...d.data(), id: d.id } as Ride))
+    .filter((r) => r.date >= todayStr && r.date <= maxDateStr)
+    .sort((a, b) => a.date.localeCompare(b.date) || a.departureTime.localeCompare(b.departureTime));
 }
 
 export async function searchRides(
@@ -253,13 +255,12 @@ export async function getRide(rideId: string): Promise<Ride | null> {
 }
 
 export async function getDriverRides(driverUid: string): Promise<Ride[]> {
-  const q = query(
-    collection(db(), 'rides'),
-    where('driverUid', '==', driverUid),
-    orderBy('createdAt', 'desc')
-  );
+  // No orderBy — avoids composite index. Sort by date+time client-side.
+  const q = query(collection(db(), 'rides'), where('driverUid', '==', driverUid));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ ...d.data(), id: d.id } as Ride));
+  return snap.docs
+    .map((d) => ({ ...d.data(), id: d.id } as Ride))
+    .sort((a, b) => (b.date + b.departureTime).localeCompare(a.date + a.departureTime));
 }
 
 export async function getAllRides(): Promise<Ride[]> {
@@ -277,17 +278,14 @@ export async function postRide(
     updatedAt: serverTimestamp(),
   });
 
-  // increment driver tripsPosted
+  // Increment driver tripsPosted. User is allowed to update their own doc.
   await updateDoc(doc(db(), 'users', data.driverUid), {
     tripsPosted: increment(1),
   });
 
-  // increment route rideCount
-  if (data.routeId) {
-    await updateDoc(doc(db(), 'routes', data.routeId), {
-      rideCount: increment(1),
-    });
-  }
+  // NOTE: rideCount on routes is NOT incremented here because Firestore
+  // security rules only allow admins to update route documents.
+  // Route stats are visible in the admin panel via getAllRides().
 
   return ref.id;
 }
@@ -319,24 +317,21 @@ export async function createBooking(
     bookedAt: serverTimestamp(),
   });
 
-  // decrement available seats
   await updateDoc(doc(db(), 'rides', data.rideId), {
     availableSeats: increment(-data.seatsBooked),
     updatedAt: serverTimestamp(),
   });
 
-  // mark ride as full if seats = 0 (handled by caller checking)
   return ref.id;
 }
 
 export async function getPassengerBookings(passengerUid: string): Promise<Booking[]> {
-  const q = query(
-    collection(db(), 'bookings'),
-    where('passengerUid', '==', passengerUid),
-    orderBy('bookedAt', 'desc')
-  );
+  // No orderBy — avoids composite index. Sort by timestamp client-side.
+  const q = query(collection(db(), 'bookings'), where('passengerUid', '==', passengerUid));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ ...d.data(), id: d.id } as Booking));
+  return snap.docs
+    .map((d) => ({ ...d.data(), id: d.id } as Booking))
+    .sort((a, b) => tsMillis(b.bookedAt) - tsMillis(a.bookedAt));
 }
 
 export async function getRideBookings(rideId: string): Promise<Booking[]> {
@@ -422,15 +417,13 @@ export function subscribeToUpcomingRides(
   maxDateStr: string,
   callback: (rides: Ride[]) => void
 ): () => void {
-  const q = query(
-    collection(db(), 'rides'),
-    where('status', '==', 'active'),
-    where('date', '>=', todayStr),
-    where('date', '<=', maxDateStr),
-    orderBy('date', 'asc'),
-    orderBy('departureTime', 'asc')
-  );
+  // Single-field where avoids composite index. Filter/sort client-side.
+  const q = query(collection(db(), 'rides'), where('status', '==', 'active'));
   return onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
-    callback(snap.docs.map((d) => ({ ...d.data(), id: d.id } as Ride)));
+    const rides = snap.docs
+      .map((d) => ({ ...d.data(), id: d.id } as Ride))
+      .filter((r) => r.date >= todayStr && r.date <= maxDateStr)
+      .sort((a, b) => a.date.localeCompare(b.date) || a.departureTime.localeCompare(b.departureTime));
+    callback(rides);
   });
 }

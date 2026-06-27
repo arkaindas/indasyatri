@@ -16,7 +16,7 @@ export function MobileNav() {
     { href: '/search', label: t('nav.findRide'), icon: '🔍' },
     { href: '/offer', label: '+', icon: null, accent: true },
     { href: '/alerts', label: t('nav.alerts'), icon: '🔔' },
-    { href: user ? '/profile' : '/search', label: t('nav.profile'), icon: '👤' },
+    { href: '/profile', label: t('nav.profile'), icon: '👤' },
   ];
 
   return (

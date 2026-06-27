@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { LangProvider } from '@/context/LangContext';
@@ -12,6 +13,7 @@ import PWABanner from '@/components/common/PWABanner';
 export const metadata: Metadata = {
   title: 'IndasYatri — ইন্দাসযাত্রী',
   description: 'Share rides, save money, travel together. Hyperlocal cab sharing for West Bengal.',
+  manifest: '/manifest.json',
   openGraph: {
     title: 'IndasYatri',
     description: 'Share rides, save money, travel together.',
@@ -28,12 +30,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body>
+        <Script
+          id="sw-register"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`,
+          }}
+        />
         <ThemeProvider>
           <LangProvider>
             <AuthProvider>
               <ToastProvider>
                 <Header />
-                <main className="max-w-5xl mx-auto px-4 pt-6 pb-4 min-h-screen">
+                <main className="max-w-5xl mx-auto px-4 pt-6 pb-24 md:pb-6 min-h-screen">
                   {children}
                 </main>
                 <Footer />
