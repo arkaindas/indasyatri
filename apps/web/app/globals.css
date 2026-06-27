@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Noto+Sans+Bengali:wght@300;400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #e8e0d4;
+  --bg-secondary: #f0e8dc;
+  --text-primary: #3d3428;
+  --text-secondary: #7a6e5d;
+  --accent: #d4781c;
+  --accent-hover: #b8651a;
+  --accent-light: #f5dfc5;
+  --success: #4a8c5c;
+  --danger: #c0392b;
+  --whatsapp: #25D366;
+  --shadow-outer: 6px 6px 12px #c4bdb2, -6px -6px 12px #ffffff;
+  --shadow-inner: inset 4px 4px 8px #c4bdb2, inset -4px -4px 8px #ffffff;
+  --shadow-sm: 3px 3px 6px #c4bdb2, -3px -3px 6px #ffffff;
+  --border-radius: 16px;
+  --border-radius-sm: 12px;
+  --border-radius-lg: 24px;
+}
+
+.dark {
+  --bg-primary: #2a2520;
+  --bg-secondary: #352f28;
+  --text-primary: #e8e0d4;
+  --text-secondary: #a89882;
+  --accent: #e8943a;
+  --accent-hover: #d4781c;
+  --accent-light: #4a3520;
+  --success: #5aa06c;
+  --danger: #e05745;
+  --shadow-outer: 6px 6px 12px #1e1a16, -6px -6px 12px #363024;
+  --shadow-inner: inset 4px 4px 8px #1e1a16, inset -4px -4px 8px #363024;
+  --shadow-sm: 3px 3px 6px #1e1a16, -3px -3px 6px #363024;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', 'Noto Sans Bengali', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.5;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+@layer components {
+  .neu-card {
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-outer);
+    border-radius: var(--border-radius);
+    padding: 20px;
+  }
+
+  .neu-card-sm {
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius-sm);
+    padding: 14px;
+  }
+
+  .neu-btn {
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-outer);
+    border-radius: var(--border-radius-sm);
+    border: none;
+    cursor: pointer;
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: box-shadow 0.15s, transform 0.1s;
+    color: var(--text-primary);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .neu-btn:active {
+    box-shadow: var(--shadow-inner);
+    transform: scale(0.98);
+  }
+
+  .neu-btn-accent {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.2), -2px -2px 6px rgba(255,255,255,0.1);
+  }
+
+  .neu-btn-accent:hover {
+    background: var(--accent-hover);
+  }
+
+  .neu-btn-accent:active {
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+  }
+
+  .neu-input {
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-inner);
+    border-radius: var(--border-radius-sm);
+    border: none;
+    padding: 12px 16px;
+    font-size: 15px;
+    color: var(--text-primary);
+    width: 100%;
+    min-height: 44px;
+    outline: none;
+    font-family: inherit;
+  }
+
+  .neu-input:focus {
+    box-shadow: var(--shadow-inner), 0 0 0 2px var(--accent);
+  }
+
+  .neu-select {
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-inner);
+    border-radius: var(--border-radius-sm);
+    border: none;
+    padding: 12px 16px;
+    font-size: 15px;
+    color: var(--text-primary);
+    width: 100%;
+    min-height: 44px;
+    outline: none;
+    cursor: pointer;
+    font-family: inherit;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a6e5d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+  }
+
+  .neu-select:focus {
+    box-shadow: var(--shadow-inner), 0 0 0 2px var(--accent);
+  }
+
+  .neu-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+
+  .neu-badge-success {
+    background: #d4edda;
+    color: var(--success);
+  }
+
+  .dark .neu-badge-success {
+    background: #1a3a26;
+    color: #5aa06c;
+  }
+
+  .neu-badge-danger {
+    background: #fde8e8;
+    color: var(--danger);
+  }
+
+  .dark .neu-badge-danger {
+    background: #3a1a1a;
+    color: #e05745;
+  }
+
+  .neu-badge-muted {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--text-secondary); border-radius: 3px; }
