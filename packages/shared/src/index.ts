@@ -24,6 +24,6 @@ export {
 
 // Firebase
 export { getFirebaseApp } from './firebase/config';
-export { signInWithGoogle, signOut, subscribeToAuthState, getCurrentUser } from './firebase/auth';
+export { signInWithGoogle, signOut, subscribeToAuthState, getCurrentUser, getRedirectSignInResult } from './firebase/auth';
 export * from './firebase/firestore';
 export { requestNotificationPermission, onForegroundMessage } from './firebase/fcm';

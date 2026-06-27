@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User as FirebaseUser } from 'firebase/auth';
 import {
   subscribeToAuthState,
+  getRedirectSignInResult,
   createOrUpdateUser,
   getUser,
 } from '@indasyatri/shared';
@@ -34,6 +35,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(u);
     }
   };
+
+  // Process pending redirect result on mount (mobile sign-in flow).
+  // Must run before the onAuthStateChanged subscription so the resolved
+  // user is available when that callback fires.
+  useEffect(() => {
+    getRedirectSignInResult().catch((err) => {
+      console.error('Redirect sign-in error:', err);
+    });
+  }, []);
 
   useEffect(() => {
     const unsub = subscribeToAuthState(async (fbUser) => {
