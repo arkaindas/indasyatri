@@ -11,7 +11,7 @@ export { t, getLang } from './i18n';
 export type { Lang } from './i18n';
 
 // Utils
-export { generateWhatsAppLink } from './utils/whatsapp';
+export { generateWhatsAppLink, generateSimpleWhatsAppLink } from './utils/whatsapp';
 export { generateCallLink } from './utils/phone';
 export { formatDate, formatTime, todayString, addDays } from './utils/date';
 export {

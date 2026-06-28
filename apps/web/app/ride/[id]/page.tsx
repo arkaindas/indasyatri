@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getRide, createBooking, type Ride } from '@indasyatri/shared';
+import { getRide, createBooking, generateSimpleWhatsAppLink, type Ride } from '@indasyatri/shared';
 import { formatTime } from '@indasyatri/shared';
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton';
 import { CallButton } from '@/components/ui/CallButton';
@@ -23,6 +23,7 @@ export default function RideDetailPage() {
   const [ride, setRide] = useState<Ride | null>(null);
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(false);
+  const [booked, setBooked] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -46,7 +47,14 @@ export default function RideDetailPage() {
         status: 'confirmed',
       });
       setRide((prev) => prev ? { ...prev, availableSeats: prev.availableSeats - 1 } : prev);
-      showToast('Seat booked! Contact the driver to confirm.', 'success');
+      setBooked(true);
+      // Auto-open WhatsApp so passenger can confirm booking with driver
+      const waUrl = generateSimpleWhatsAppLink(
+        ride.driverWhatsapp,
+        `Hi, I've booked a seat on your ${ride.date} ride from ${ride.routeFrom} to ${ride.routeTo} on IndasYatri. Please confirm my booking.`
+      );
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+      showToast("Seat booked! WhatsApp opened to confirm with driver.", 'success');
     } catch {
       showToast(t('common.error'), 'error');
     } finally {
@@ -127,10 +135,15 @@ export default function RideDetailPage() {
                   <WhatsAppButton ride={ride} label={t('ride.whatsapp')} size="md" />
                   <CallButton phone={ride.driverPhone} label={t('ride.call')} size="md" />
                 </div>
-                {user && (
+                {user && !booked && (
                   <NeuButton variant="accent" onClick={handleBook} disabled={booking} className="w-full">
                     {booking ? t('common.loading') : t('ride.bookSeat')}
                   </NeuButton>
+                )}
+                {user && booked && (
+                  <div className="p-3 rounded-[12px] text-center text-sm font-medium" style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}>
+                    ✓ Seat booked! Open WhatsApp above to confirm pickup details.
+                  </div>
                 )}
               </>
             ) : (

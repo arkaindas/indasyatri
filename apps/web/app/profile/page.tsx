@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { NeuInput } from '@/components/ui/NeuInput';
 import { NeuButton } from '@/components/ui/NeuButton';
@@ -127,6 +128,25 @@ function ProfileForm() {
         <NeuButton variant="accent" onClick={handleSave} disabled={saving}>
           {saving ? t('common.loading') : t('profile.save')}
         </NeuButton>
+      </div>
+
+      {/* Quick navigation */}
+      <div className="neu-card flex flex-col gap-2">
+        <Link
+          href="/my-rides"
+          className="flex items-center justify-between py-2 px-1 rounded-[12px] hover:text-[var(--accent)] transition-colors"
+        >
+          <span className="font-medium">🚗 {t('nav.myRides')}</span>
+          <span className="text-[var(--text-secondary)]">→</span>
+        </Link>
+        <div style={{ borderTop: '1px solid var(--bg-secondary)' }} />
+        <Link
+          href="/my-bookings"
+          className="flex items-center justify-between py-2 px-1 rounded-[12px] hover:text-[var(--accent)] transition-colors"
+        >
+          <span className="font-medium">🎫 {t('nav.myBookings')}</span>
+          <span className="text-[var(--text-secondary)]">→</span>
+        </Link>
       </div>
     </div>
   );

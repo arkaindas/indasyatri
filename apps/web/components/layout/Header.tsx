@@ -37,6 +37,7 @@ export function Header() {
           {user && (
             <>
               <NavLink href="/my-rides">{t('nav.myRides')}</NavLink>
+              <NavLink href="/my-bookings">{t('nav.myBookings')}</NavLink>
               <NavLink href="/alerts">{t('nav.alerts')}</NavLink>
             </>
           )}
